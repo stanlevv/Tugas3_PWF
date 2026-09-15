@@ -66,3 +66,36 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server.' });
     }
 };
+
+// 3. Fungsi Ubah Password Pengguna
+export const changePassword = async (req: Request, res: Response): Promise<void> => {
+    const userId = res.locals.userId;
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+        res.status(400).json({ success: false, message: 'Password lama dan password baru wajib diisi!' });
+        return;
+    }
+
+    if (newPassword.length < 6) {
+        res.status(400).json({ success: false, message: 'Password baru minimal 6 karakter!' });
+        return;
+    }
+
+    try {
+        const user = await UserModel.findById(userId);
+        if (!user || !(await bcrypt.compare(oldPassword, user.password))) {
+            res.status(401).json({ success: false, message: 'Password lama tidak sesuai!' });
+            return;
+        }
+
+        const hashedNew = await bcrypt.hash(newPassword, 10);
+        await UserModel.updatePassword(userId, hashedNew);
+
+        res.status(200).json({ success: true, message: 'Password berhasil diubah!' });
+    } catch (error) {
+        console.error('Error changePassword:', error);
+        res.status(500).json({ success: false, message: 'Gagal mengubah password.' });
+    }
+};
+
