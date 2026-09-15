@@ -75,37 +75,157 @@ export const authApi = {
       body: JSON.stringify(payload),
     });
   },
+
+  changePassword: async (payload: { oldPassword: string; newPassword: string }) => {
+    return request<{ success: boolean; message: string }>('/auth/change-password', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
 };
 
-// 4. Todo API Endpoints (CRUD MySQL)
-export const todoApi = {
+// 4. Project API Endpoints (Team Plan / Ruang Kelompok)
+export const projectApi = {
   getAll: async () => {
     return request<{
       success: boolean;
-      data: Array<{ id: number; user_id: number; task: string; is_completed: number }>;
-    }>('/todos');
+      data: Array<{
+        id: number;
+        name: string;
+        code: string;
+        created_by: number;
+        created_at: string;
+        creator_username?: string;
+        member_count?: number;
+      }>;
+    }>('/projects');
+  },
+
+  getDetail: async (id: number | string) => {
+    return request<{
+      success: boolean;
+      data: {
+        id: number;
+        name: string;
+        code: string;
+        created_by: number;
+        created_at: string;
+        creator_username?: string;
+        members: Array<{
+          id: number;
+          project_id: number;
+          user_id: number;
+          username: string;
+          email: string;
+          joined_at: string;
+        }>;
+      };
+    }>(`/projects/${id}`);
+  },
+
+  create: async (name: string) => {
+    return request<{
+      success: boolean;
+      message: string;
+      data: {
+        id: number;
+        name: string;
+        code: string;
+        created_by: number;
+        created_at: string;
+      };
+    }>('/projects', {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    });
+  },
+
+  join: async (code: string) => {
+    return request<{
+      success: boolean;
+      message: string;
+      data: {
+        id: number;
+        name: string;
+        code: string;
+        created_by: number;
+        created_at: string;
+      };
+    }>('/projects/join', {
+      method: 'POST',
+      body: JSON.stringify({ code }),
+    });
+  },
+
+  leave: async (id: number | string) => {
+    return request<{ success: boolean; message: string }>(`/projects/${id}/leave`, {
+      method: 'POST',
+    });
+  },
+
+  delete: async (id: number | string) => {
+    return request<{ success: boolean; message: string }>(`/projects/${id}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
+// 5. Todo API Endpoints (CRUD MySQL)
+export const todoApi = {
+  getAll: async (projectId?: number | null) => {
+    const query = projectId ? `?project_id=${projectId}` : '';
+    return request<{
+      success: boolean;
+      data: Array<{
+        id: number;
+        user_id: number;
+        project_id?: number | null;
+        task: string;
+        is_completed: number;
+        creator_username?: string;
+      }>;
+    }>(`/todos${query}`);
   },
 
   getById: async (id: number | string) => {
     return request<{
       success: boolean;
-      data: { id: number; user_id: number; task: string; is_completed: number };
+      data: {
+        id: number;
+        user_id: number;
+        project_id?: number | null;
+        task: string;
+        is_completed: number;
+        creator_username?: string;
+        project_name?: string;
+      };
     }>(`/todos/${id}`);
   },
 
-  create: async (task: string) => {
+  create: async (task: string, projectId?: number | null) => {
     return request<{
       success: boolean;
       message: string;
-      data: { id: number; user_id: number; task: string; is_completed: number };
+      data: {
+        id: number;
+        user_id: number;
+        project_id?: number | null;
+        task: string;
+        is_completed: number;
+        creator_username?: string;
+      };
     }>('/todos', {
       method: 'POST',
-      body: JSON.stringify({ task }),
+      body: JSON.stringify({ task, project_id: projectId || undefined }),
     });
   },
 
   update: async (id: number | string, payload: { is_completed?: boolean | number; task?: string }) => {
-    return request<{ success: boolean; message: string }>(`/todos/${id}`, {
+    return request<{
+      success: boolean;
+      message: string;
+      data?: { id: number; user_id: number; task: string; is_completed: number };
+    }>(`/todos/${id}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
     });

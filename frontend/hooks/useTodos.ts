@@ -4,43 +4,48 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { todoApi, getAuthToken } from '@/lib/api';
 import { Todo, normalizeTodo } from '@/types/todo';
 
-const CACHE_KEY = 'todo_app_cache_data';
-
 export type FilterType = 'all' | 'pending' | 'completed';
 
-export function useTodos() {
+export function useTodos(projectId?: number | null) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterType>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // 1. Caching Layer: Ambil dari cache local storage terlebih dahulu (Instant UI / Fast Render)
+  const cacheKey = useMemo(() => {
+    return projectId ? `todo_app_cache_project_${projectId}` : 'todo_app_cache_personal';
+  }, [projectId]);
+
+  // 1. Caching Layer: Ambil dari cache local storage terlebih dahulu
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        const cached = localStorage.getItem(CACHE_KEY);
+        const cached = localStorage.getItem(cacheKey);
         if (cached) {
           const parsed: any[] = JSON.parse(cached);
           if (Array.isArray(parsed)) {
             setTodos(parsed.map(normalizeTodo));
           }
+        } else {
+          setTodos([]);
         }
       } catch (e) {
         console.warn('Gagal membaca cache lokal:', e);
       }
     }
-  }, []);
+  }, [cacheKey]);
 
   // Simpan state terbaru ke cache
   const updateCache = useCallback((updatedTodos: Todo[]) => {
     if (typeof window !== 'undefined') {
       try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(updatedTodos));
+        localStorage.setItem(cacheKey, JSON.stringify(updatedTodos));
       } catch (e) {
         console.warn('Gagal menyimpan cache:', e);
       }
     }
-  }, []);
+  }, [cacheKey]);
 
   // 2. Fetch Data Nyata dari Backend MySQL Laragon
   const fetchTodos = useCallback(async () => {
@@ -54,7 +59,7 @@ export function useTodos() {
     setError(null);
 
     try {
-      const response = await todoApi.getAll();
+      const response = await todoApi.getAll(projectId);
       if (response.success && Array.isArray(response.data)) {
         const normalized = response.data.map(normalizeTodo);
         setTodos(normalized);
@@ -65,21 +70,20 @@ export function useTodos() {
     } finally {
       setLoading(false);
     }
-  }, [updateCache]);
+  }, [projectId, updateCache]);
 
-  // Muat data saat komponen mount
   useEffect(() => {
     fetchTodos();
   }, [fetchTodos]);
 
-  // 3. Tambah Tugas Baru (Persisten ke MySQL Laragon)
+  // 3. Tambah Tugas Baru (Pribadi atau Kelompok)
   const addTodo = async (task: string) => {
     const trimmed = task.trim();
     if (!trimmed) return;
 
     setError(null);
     try {
-      const res = await todoApi.create(trimmed);
+      const res = await todoApi.create(trimmed, projectId);
       if (res.success && res.data) {
         const newTodo = normalizeTodo(res.data);
         setTodos((prev) => {
@@ -94,7 +98,7 @@ export function useTodos() {
     }
   };
 
-  // 4. Toggle Status Tugas (Selesai / Belum Selesai di MySQL Laragon)
+  // 4. Toggle Status Tugas (Selesai / Belum Selesai)
   const toggleTodo = async (id: number) => {
     const target = todos.find((t) => t.id === id);
     if (!target) return;
@@ -121,7 +125,35 @@ export function useTodos() {
     }
   };
 
-  // 5. Hapus Tugas (Hapus Permanen dari MySQL Laragon)
+  // 5. Edit Isi Teks Tugas
+  const updateTodoText = async (id: number, newText: string) => {
+    const trimmed = newText.trim();
+    if (!trimmed) return;
+
+    const target = todos.find((t) => t.id === id);
+    if (!target) return;
+
+    // Optimistic update
+    setTodos((prev) => {
+      const next = prev.map((t) => (t.id === id ? { ...t, task: trimmed, title: trimmed } : t));
+      updateCache(next);
+      return next;
+    });
+
+    try {
+      await todoApi.update(id, { task: trimmed });
+    } catch (err: any) {
+      setTodos((prev) => {
+        const rolledBack = prev.map((t) => (t.id === id ? target : t));
+        updateCache(rolledBack);
+        return rolledBack;
+      });
+      setError('Gagal mengedit isi tugas.');
+      throw err;
+    }
+  };
+
+  // 6. Hapus Tugas
   const deleteTodo = async (id: number) => {
     const previousTodos = [...todos];
 
@@ -135,24 +167,32 @@ export function useTodos() {
     try {
       await todoApi.delete(id);
     } catch (err: any) {
-      // Rollback jika error
       setTodos(previousTodos);
       updateCache(previousTodos);
-      setError('Gagal menghapus tugas dari server.');
+      setError(err.message || 'Gagal menghapus tugas dari server.');
+      throw err;
     }
   };
 
-  // 6. Filter & Statistik Terkalkulasi (State Integration)
+  // 7. Filter & Pencarian Teks
   const filteredTodos = useMemo(() => {
-    switch (filter) {
-      case 'completed':
-        return todos.filter((t) => t.completed);
-      case 'pending':
-        return todos.filter((t) => !t.completed);
-      default:
-        return todos;
-    }
-  }, [todos, filter]);
+    return todos.filter((t) => {
+      // Filter status
+      const matchesFilter =
+        filter === 'all'
+          ? true
+          : filter === 'completed'
+          ? t.completed
+          : !t.completed;
+
+      // Filter search query
+      const matchesSearch = searchQuery.trim() === '' ||
+        (t.task && t.task.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (t.creator_username && t.creator_username.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      return matchesFilter && matchesSearch;
+    });
+  }, [todos, filter, searchQuery]);
 
   const stats = useMemo(() => {
     const total = todos.length;
@@ -168,9 +208,12 @@ export function useTodos() {
     error,
     filter,
     setFilter,
+    searchQuery,
+    setSearchQuery,
     stats,
     addTodo,
     toggleTodo,
+    updateTodoText,
     deleteTodo,
     refresh: fetchTodos,
   };

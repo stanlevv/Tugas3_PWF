@@ -63,12 +63,12 @@ export function useAuth() {
     }
   };
 
-  // Fungsi Logout
+  // Fungsi Logout (Redirect langsung ke Landing Page)
   const logout = useCallback(() => {
     clearAuthSession();
     setToken(null);
     setUser(null);
-    router.push('/login');
+    router.push('/');
   }, [router]);
 
   return {
