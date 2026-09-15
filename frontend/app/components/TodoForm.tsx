@@ -1,51 +1,62 @@
 'use client';
+
 import React, { useState } from 'react';
-import { Button } from '@/app/components/ui/button';
-import { Input } from './ui/input';
+import { motion } from 'framer-motion';
 
 type TodoFormProps = {
   onAddTodo: (title: string) => void;
 };
 
+const SPRING_TRANSITION = { duration: 0.15, ease: 'easeOut' as const };
+
 export default function TodoForm({ onAddTodo }: TodoFormProps) {
-  // Local state untuk controlled input form
   const [title, setTitle] = useState('');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    // Validasi sederhana: jangan izinkan input kosong atau hanya spasi
     const trimmedTitle = title.trim();
     if (!trimmedTitle) return;
 
-    // Kirim data ke komponen induk
     onAddTodo(trimmedTitle);
-
-    // Reset input form
     setTitle('');
   };
 
   return (
-    <div className="mb-6 bg-white p-4 rounded-xl border border-gray-70">
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <Input
+    <form onSubmit={handleSubmit} className="w-full">
+      <div className="relative flex items-center bg-white/90 backdrop-blur-md rounded-2xl border border-zinc-200/90 shadow-2xs hover:border-zinc-300 focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-600 p-1.5 transition-all">
+        {/* Leading Search/Plus Vector Icon */}
+        <div className="pl-3 pr-1 text-zinc-400">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+        </div>
+
+        {/* Text Input */}
+        <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Tambahkan tugas baru..."
-          className="flex-1 bg-white"
-          variantSize="md"
+          placeholder="Ketik tugas baru atau catatan aktivitas..."
+          className="flex-1 bg-transparent px-2 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
         />
 
-        <Button
+        {/* Keyboard shortcut hint */}
+        <kbd className="hidden sm:inline-flex items-center px-2 py-0.5 text-[10px] font-mono font-medium text-zinc-400 bg-zinc-100 border border-zinc-200/70 rounded-md mr-1.5 select-none">
+          ↵ Enter
+        </kbd>
+
+        {/* Submit Button */}
+        <motion.button
+          whileHover={{ scale: 1.025 }}
+          whileTap={{ scale: 0.96 }}
+          transition={SPRING_TRANSITION}
           type="submit"
           disabled={!title.trim()}
-          variant="default"
-          size="md"
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition-colors disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-xs"
         >
-          Tambah
-        </Button>
-      </form>
-    </div>
+          <span>Tambah</span>
+        </motion.button>
+      </div>
+    </form>
   );
 }
