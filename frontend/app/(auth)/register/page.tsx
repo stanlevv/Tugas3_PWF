@@ -4,21 +4,34 @@ import RegisterForm from "./components/RegisterForm";
 
 export default function RegisterPage() {
   return (
-    <main className="min-h-screen p-8 bg-gray-100 flex items-center justify-center">
-      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-        <header className="mb-6 border-b pb-4 text-center">
-          <h1 className="text-2xl font-bold text-gray-800">Register</h1>
+    <main className="min-h-screen p-6 md:p-8 bg-gray-50 flex items-center justify-center">
+      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-sm border border-gray-200/80">
+        {/* Tombol Kembali ke Landing Page */}
+        <div className="mb-6">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Kembali ke Halaman Utama
+          </Link>
+        </div>
+
+        <header className="mb-6 border-b border-gray-100 pb-4 text-center">
+          <h1 className="text-2xl font-bold text-gray-900">Register</h1>
           <p className="text-sm text-gray-500 mt-1">Buat akun baru</p>
         </header>
 
         {/* Form Komponen */}
         <RegisterForm />
 
-        <div className="mt-6 border-t pt-4 text-center">
+        <div className="mt-6 border-t border-gray-100 pt-4 text-center">
           <p className="text-sm text-gray-600">
             Sudah punya akun?{' '}
-            <Link href="/login" className="text-blue-600 hover:underline font-medium">
-            Login di sini
+            <Link href="/login" className="text-[#0070f3] hover:underline font-medium">
+              Login di sini
             </Link>
           </p>
         </div>
