@@ -84,6 +84,7 @@ export default function TodoList({
 
         {/* Filter Buttons & Refresh */}
         <div className="flex items-center gap-1.5 self-end sm:self-auto">
+          {/* Tombol Semua (Blue active state) */}
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
@@ -92,7 +93,7 @@ export default function TodoList({
             onClick={() => onFilterChange('all')}
             className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
               filter === 'all'
-                ? 'bg-zinc-900 text-white shadow-xs'
+                ? 'bg-blue-600 text-white shadow-xs'
                 : 'bg-white text-zinc-600 hover:bg-zinc-100 border border-zinc-200/80'
             }`}
           >
@@ -168,7 +169,7 @@ export default function TodoList({
       {/* EMPTY STATE */}
       {!loading && todos.length === 0 && (
         <div className="text-center py-12 px-4 border-2 border-dashed border-zinc-200/80 rounded-3xl bg-zinc-50/40 space-y-2">
-          <div className="w-10 h-10 rounded-2xl bg-zinc-100 text-zinc-400 flex items-center justify-center mx-auto mb-1">
+          <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-1">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>

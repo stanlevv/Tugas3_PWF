@@ -2,9 +2,6 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { UserModel } from '../models/userModel.js';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 // 1. Fungsi Registrasi User Baru
 export const register = async (req: Request, res: Response): Promise<void> => {

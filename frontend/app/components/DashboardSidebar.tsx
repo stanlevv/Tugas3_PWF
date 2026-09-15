@@ -63,8 +63,8 @@ export default function DashboardSidebar({
               title="Kembali ke Beranda"
               className="flex items-center gap-2.5 group"
             >
-              {/* Minimalist Geometric Mark Logo */}
-              <div className="w-8 h-8 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-bold text-xs shadow-xs group-hover:bg-blue-600 transition-colors">
+              {/* Minimalist Geometric Mark Logo in Blue */}
+              <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-xs group-hover:bg-blue-700 transition-colors">
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                 </svg>
@@ -104,21 +104,7 @@ export default function DashboardSidebar({
 
           {/* Nav Items */}
           <div className="space-y-1">
-            {/* 1. Beranda Link */}
-            <Link
-              href="/"
-              title="Beranda"
-              className={`flex items-center gap-2.5 px-3 py-2 text-xs font-medium rounded-xl text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/80 transition-all ${
-                isCollapsed ? 'justify-center' : ''
-              }`}
-            >
-              <svg className="w-4 h-4 text-zinc-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-              {!isCollapsed && <span>Beranda Utama</span>}
-            </Link>
-
-            {/* 2. Tugas Pribadi */}
+            {/* 1. Tugas Pribadi */}
             <motion.button
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
@@ -148,6 +134,27 @@ export default function DashboardSidebar({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
               {!isCollapsed && <span>Tugas Pribadi</span>}
+            </motion.button>
+
+            {/* 2. Buat / Gabung Ruang Kelompok Button in Sidebar */}
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              transition={SPRING_TRANSITION}
+              type="button"
+              onClick={() => {
+                onOpenProjectModal();
+                onMobileClose();
+              }}
+              title="Buat atau Gabung Ruang Kelompok"
+              className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium rounded-xl transition-all cursor-pointer text-zinc-600 hover:text-blue-600 hover:bg-blue-50/60 ${
+                isCollapsed ? 'justify-center' : ''
+              }`}
+            >
+              <svg className="w-4 h-4 text-zinc-500 hover:text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              {!isCollapsed && <span>Buat / Gabung Ruang</span>}
             </motion.button>
           </div>
 
@@ -184,7 +191,7 @@ export default function DashboardSidebar({
                       isCollapsed ? 'justify-center' : ''
                     } ${
                       isActive
-                        ? 'bg-zinc-900 text-white shadow-xs font-semibold'
+                        ? 'bg-blue-600 text-white shadow-xs font-semibold'
                         : 'text-zinc-700 hover:bg-zinc-100/80 hover:text-zinc-900'
                     }`}
                   >
@@ -237,8 +244,8 @@ export default function DashboardSidebar({
               isCollapsed ? 'justify-center' : ''
             }`}
           >
-            {/* User Avatar */}
-            <div className="w-8 h-8 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-bold text-xs shadow-xs flex-shrink-0 group-hover:bg-blue-600 transition-colors">
+            {/* User Avatar in Blue */}
+            <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-xs flex-shrink-0 group-hover:bg-blue-700 transition-colors">
               {user?.username?.charAt(0).toUpperCase() || 'U'}
             </div>
 

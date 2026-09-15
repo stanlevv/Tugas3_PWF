@@ -1,15 +1,22 @@
 import { Router } from 'express';
 import { getTodos, getTodoById, createTodo, updateTodo, deleteTodo } from '../controllers/todoController.js';
-import { validateTodo } from '../middlewares/validator.js';
-import { verifyToken } from '../middlewares/authMiddleware.js';
+import { validateTodo, validateUpdateTodo } from '../middlewares/validator.js';
 
 const router = Router();
 
-// Rute CRUD Todo (Tugas Pribadi & Ruang Kelompok)
-router.get('/', verifyToken, getTodos);
-router.get('/:id', verifyToken, getTodoById);
-router.post('/', verifyToken, validateTodo, createTodo);
-router.put('/:id', verifyToken, updateTodo);
-router.delete('/:id', verifyToken, deleteTodo);
+// GET /api/todos - Ambil semua todo milik user
+router.get('/', getTodos);
+
+// GET /api/todos/:id - Ambil satu todo berdasarkan ID
+router.get('/:id', getTodoById);
+
+// POST /api/todos - Tambah todo baru
+router.post('/', validateTodo, createTodo);
+
+// PUT /api/todos/:id - Update todo (task atau status selesai)
+router.put('/:id', validateUpdateTodo, updateTodo);
+
+// DELETE /api/todos/:id - Hapus todo
+router.delete('/:id', deleteTodo);
 
 export default router;

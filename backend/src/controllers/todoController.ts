@@ -49,7 +49,7 @@ export const getTodoById = async (req: Request, res: Response): Promise<void> =>
     try {
         const todo: any = await TodoModel.getById(id);
         if (!todo) {
-            res.status(404).json({ success: false, message: 'Tugas tidak ditemukan.' });
+            res.status(404).json({ success: false, message: 'Tugas tidak ditemukan!' });
             return;
         }
 
@@ -126,7 +126,7 @@ export const updateTodo = async (req: Request, res: Response): Promise<void> => 
     try {
         const todo: any = await TodoModel.getById(id);
         if (!todo) {
-            res.status(404).json({ success: false, message: 'Tugas tidak ditemukan.' });
+            res.status(404).json({ success: false, message: 'Tugas tidak ditemukan!' });
             return;
         }
 
@@ -164,7 +164,7 @@ export const deleteTodo = async (req: Request, res: Response): Promise<void> => 
     try {
         const todo: any = await TodoModel.getById(id);
         if (!todo) {
-            res.status(404).json({ success: false, message: 'Tugas tidak ditemukan.' });
+            res.status(404).json({ success: false, message: 'Tugas tidak ditemukan!' });
             return;
         }
 

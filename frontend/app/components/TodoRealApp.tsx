@@ -118,7 +118,7 @@ export default function TodoRealApp() {
           </button>
 
           <div className="flex items-center gap-2 font-bold text-sm text-zinc-900">
-            <div className="w-6 h-6 rounded-lg bg-zinc-950 text-white flex items-center justify-center text-[10px]">
+            <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-[10px]">
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
@@ -129,7 +129,7 @@ export default function TodoRealApp() {
           <button
             type="button"
             onClick={() => setIsAccountModalOpen(true)}
-            className="w-7 h-7 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-bold text-xs shadow-2xs cursor-pointer"
+            className="w-7 h-7 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-2xs cursor-pointer"
           >
             {user?.username?.charAt(0).toUpperCase() || 'U'}
           </button>
@@ -150,19 +150,21 @@ export default function TodoRealApp() {
               </p>
             </div>
 
+            {/* Top Right: Logout Button with SVG Icon */}
             <div className="flex items-center gap-2">
               <motion.button
                 whileHover={{ scale: 1.025 }}
                 whileTap={{ scale: 0.96 }}
                 transition={SPRING_TRANSITION}
                 type="button"
-                onClick={() => setIsProjectModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-zinc-50 text-zinc-800 text-xs font-semibold rounded-xl border border-zinc-200/90 shadow-2xs transition-colors cursor-pointer"
+                onClick={logout}
+                title="Keluar dari sesi dan kembali ke Landing Page"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-red-50 text-zinc-700 hover:text-red-600 text-xs font-semibold rounded-xl border border-zinc-200/90 shadow-2xs transition-colors cursor-pointer group"
               >
-                <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <svg className="w-3.5 h-3.5 text-zinc-400 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                <span>Buat / Gabung Ruang</span>
+                <span>Keluar (Logout)</span>
               </motion.button>
             </div>
           </div>
