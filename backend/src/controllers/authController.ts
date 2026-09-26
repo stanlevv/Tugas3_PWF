@@ -2,97 +2,82 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { UserModel } from '../models/userModel.js';
+import type { RegisterRequest, LoginRequest, JwtUserPayload } from '../types/auth.js';
+import { sendSuccess, sendError } from '../utils/response.js';
 
-// 1. Fungsi Registrasi User Baru
+// 1. Registrasi User Baru
 export const register = async (req: Request, res: Response): Promise<void> => {
-    const { username, email, password } = req.body;
-
-    if (!username || !email || !password) {
-        res.status(400).json({ success: false, message: 'Username, email, dan password wajib diisi!' });
-        return;
-    }
-
+    const payload: RegisterRequest = req.body;
     try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await UserModel.create(username, email, hashedPassword);
-        res.status(201).json({ success: true, message: 'Registrasi berhasil!' });
+        const hashedPassword = await bcrypt.hash(payload.password, 10);
+        await UserModel.create(payload.username, payload.email, hashedPassword);
+        sendSuccess(res, 'Registrasi berhasil!', undefined, 201);
     } catch (error: any) {
         if (error.code === 'ER_DUP_ENTRY') {
-            res.status(409).json({ success: false, message: 'Username atau Email sudah terdaftar!' });
+            sendError(res, 'Username atau Email sudah terdaftar!', 409);
             return;
         }
-        res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server.' });
+        sendError(res, 'Error server.', 500);
     }
 };
 
-// 2. Fungsi Login User
+// 2. Login User
 export const login = async (req: Request, res: Response): Promise<void> => {
-    const { username, email, password } = req.body;
-    const identifier = username || email;
-
-    if (!identifier || !password) {
-        res.status(400).json({ success: false, message: 'Username/Email dan password wajib diisi!' });
-        return;
-    }
-
+    const payload: LoginRequest = req.body;
     try {
-        const user = await UserModel.findByUsernameOrEmail(identifier);
+        const user = await UserModel.findByUsername(payload.username);
 
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-            res.status(401).json({ success: false, message: 'Username/Email atau password salah!' });
+        if (!user || !(await bcrypt.compare(payload.password, user.password))) {
+            sendError(res, 'Username atau password salah!', 401);
             return;
         }
 
+        const tokenPayload: JwtUserPayload = {
+            id: user.id,
+            username: user.username,
+            email: user.email
+        };
+
         const token = jwt.sign(
-            { id: user.id, username: user.username, email: user.email },
-            process.env.JWT_SECRET as string,
+            tokenPayload,
+            process.env.JWT_SECRET || 'jwt_secret_key_tugas4_praktikum_062',
             { expiresIn: '24h' }
         );
 
-        res.status(200).json({
-            success: true,
-            message: 'Login berhasil!',
-            token,
-            data: {
-                id: user.id,
-                username: user.username,
-                email: user.email
-            }
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server.' });
+        sendSuccess(res, 'Login berhasil!', { token });
+    } catch {
+        sendError(res, 'Error server.', 500);
     }
 };
 
-// 3. Fungsi Ubah Password Pengguna
+// 3. Ubah Password Pengguna
 export const changePassword = async (req: Request, res: Response): Promise<void> => {
-    const userId = res.locals.userId;
+    const userId = req.user.id;
     const { oldPassword, newPassword } = req.body;
 
     if (!oldPassword || !newPassword) {
-        res.status(400).json({ success: false, message: 'Password lama dan password baru wajib diisi!' });
+        sendError(res, 'Password lama dan password baru wajib diisi!', 400);
         return;
     }
 
     if (newPassword.length < 6) {
-        res.status(400).json({ success: false, message: 'Password baru minimal 6 karakter!' });
+        sendError(res, 'Password baru minimal 6 karakter!', 400);
         return;
     }
 
     try {
         const user = await UserModel.findById(userId);
         if (!user || !(await bcrypt.compare(oldPassword, user.password))) {
-            res.status(401).json({ success: false, message: 'Password lama tidak sesuai!' });
+            sendError(res, 'Password lama tidak sesuai!', 401);
             return;
         }
 
         const hashedNew = await bcrypt.hash(newPassword, 10);
         await UserModel.updatePassword(userId, hashedNew);
 
-        res.status(200).json({ success: true, message: 'Password berhasil diubah!' });
+        sendSuccess(res, 'Password berhasil diubah!');
     } catch (error) {
         console.error('Error changePassword:', error);
-        res.status(500).json({ success: false, message: 'Gagal mengubah password.' });
+        sendError(res, 'Gagal mengubah password.', 500);
     }
 };
-

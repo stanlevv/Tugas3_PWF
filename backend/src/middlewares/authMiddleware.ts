@@ -1,21 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import type { JwtUserPayload } from '../types/auth.js';
+import { sendError } from '../utils/response.js';
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
-        res.status(401).json({ success: false, message: 'Akses ditolak. Token tidak ditemukan!' });
+        sendError(res, 'Akses ditolak. Token tidak ditemukan!', 401);
         return;
     }
 
     try {
-        // Cek apakah token sah dengan kunci rahasia JWT_SECRET
-        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: number };
-        res.locals.userId = decoded.id; // Simpan ID user agar bisa dipakai controller
-        next(); // Lolos, izinkan masuk!
-    } catch (error) {
-        res.status(403).json({ success: false, message: 'Sesi tidak valid atau kedaluwarsa!' });
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET || 'jwt_secret_key_tugas4_praktikum_062'
+        ) as JwtUserPayload;
+        req.user = decoded;
+        next();
+    } catch {
+        sendError(res, 'Sesi tidak valid atau kedaluwarsa!', 403);
     }
 };

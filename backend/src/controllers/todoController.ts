@@ -1,190 +1,127 @@
 import { Request, Response } from 'express';
 import { TodoModel } from '../models/todoModel.js';
-import { ProjectModel } from '../models/projectModel.js';
+import type { CreateTodoRequest, UpdateTodoRequest, TodoResponse, TodoRow } from '../types/todo.js';
+import type { PaginationMeta } from '../types/common.js';
+import { sendSuccess, sendSuccessPagination, sendError } from '../utils/response.js';
 
-// 1. Ambil Semua Todo (Mendukung Tugas Pribadi vs Ruang Project)
+const parsePositiveInt = (value: unknown, fallback: number): number => {
+    const parsed = Number(value);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+};
+
 export const getTodos = async (req: Request, res: Response): Promise<void> => {
-    const userId = res.locals.userId;
-    const projectIdQuery = req.query.project_id;
+    const userId = req.user.id;
+    const page = parsePositiveInt(req.query.page, 1);
+    const perPage = Math.min(parsePositiveInt(req.query.perPage, 10), 50);
+    const offset = (page - 1) * perPage;
 
     try {
-        if (projectIdQuery && projectIdQuery !== 'undefined' && projectIdQuery !== 'null') {
-            const projectId = parseInt(projectIdQuery as string, 10);
-            if (isNaN(projectId)) {
-                res.status(400).json({ success: false, message: 'ID project tidak valid.' });
-                return;
-            }
+        const [todos, total] = await Promise.all([
+            TodoModel.getByUserId(userId, perPage, offset),
+            TodoModel.countByUserId(userId)
+        ]);
 
-            // Verifikasi apakah user adalah anggota project
-            const isMember = await ProjectModel.isMember(projectId, userId);
-            if (!isMember) {
-                res.status(403).json({ success: false, message: 'Anda bukan anggota project ini!' });
-                return;
-            }
+        const data: TodoResponse[] = (todos as TodoRow[]).map(({ id, task, is_completed }) => ({
+            id,
+            todo: task,
+            completed: Boolean(is_completed)
+        }));
 
-            const todos = await TodoModel.getByProjectId(projectId);
-            res.status(200).json({ success: true, data: todos });
-            return;
-        }
+        const pagination: PaginationMeta = {
+            page,
+            perPage,
+            total,
+            totalPages: Math.ceil(total / perPage)
+        };
 
-        // Default: Tugas Pribadi (project_id IS NULL)
-        const todos = await TodoModel.getByUserId(userId);
-        res.status(200).json({ success: true, data: todos });
+        sendSuccessPagination(res, 'Berhasil!', data, pagination);
     } catch (error) {
-        console.error('Error getTodos:', error);
-        res.status(500).json({ success: false, message: 'Gagal mengambil data tugas.' });
+        console.log(error);
+        sendError(res, 'Gagal mengambil data.', 500);
     }
 };
 
-// 2. Ambil Detail Todo Berdasarkan ID
 export const getTodoById = async (req: Request, res: Response): Promise<void> => {
-    const userId = res.locals.userId;
-    const id = parseInt(req.params.id as string, 10);
-
-    if (isNaN(id)) {
-        res.status(400).json({ success: false, message: 'ID tugas tidak valid.' });
-        return;
-    }
+    const { id } = req.params;
+    const userId = req.user.id;
 
     try {
-        const todo: any = await TodoModel.getById(id);
+        const todo = await TodoModel.getById(Number(id), userId);
+
         if (!todo) {
-            res.status(404).json({ success: false, message: 'Tugas tidak ditemukan!' });
+            sendError(res, 'Tugas tidak ditemukan!', 404);
             return;
         }
 
-        // Cek izin akses: jika todo milik project, cek keanggotaan; jika pribadi, cek user_id
-        if (todo.project_id) {
-            const isMember = await ProjectModel.isMember(todo.project_id, userId);
-            if (!isMember) {
-                res.status(403).json({ success: false, message: 'Akses ditolak ke tugas kelompok ini.' });
-                return;
-            }
-        } else if (todo.user_id !== userId) {
-            res.status(403).json({ success: false, message: 'Akses ditolak ke tugas pribadi ini.' });
-            return;
-        }
+        const row = todo as TodoRow;
+        const data: TodoResponse = {
+            id: row.id,
+            todo: row.task,
+            completed: Boolean(row.is_completed)
+        };
 
-        res.status(200).json({ success: true, data: todo });
-    } catch (error) {
-        console.error('Error getTodoById:', error);
-        res.status(500).json({ success: false, message: 'Gagal mengambil detail tugas.' });
+        sendSuccess(res, 'Berhasil!', data);
+    } catch {
+        sendError(res, 'Gagal mengambil data.', 500);
     }
 };
 
-// 3. Tambahkan Todo Baru (Pribadi atau Kelompok)
 export const createTodo = async (req: Request, res: Response): Promise<void> => {
-    const { task, project_id } = req.body;
-    const userId = res.locals.userId;
-
-    if (!task || typeof task !== 'string' || task.trim() === '') {
-        res.status(400).json({ success: false, message: 'Tugas (task) wajib diisi!' });
-        return;
-    }
-
-    let parsedProjectId: number | null = null;
-    if (project_id) {
-        parsedProjectId = parseInt(project_id, 10);
-        if (isNaN(parsedProjectId)) {
-            res.status(400).json({ success: false, message: 'ID project tidak valid.' });
-            return;
-        }
-
-        const isMember = await ProjectModel.isMember(parsedProjectId, userId);
-        if (!isMember) {
-            res.status(403).json({ success: false, message: 'Anda bukan anggota dari project ini!' });
-            return;
-        }
-    }
+    const payload: CreateTodoRequest = req.body;
+    const userId = req.user.id;
 
     try {
-        const newId = await TodoModel.create(userId, task.trim(), parsedProjectId);
-        const createdTodo = await TodoModel.getById(newId);
+        const newId = await TodoModel.create(userId, payload.task);
+        const data: TodoResponse = {
+            id: newId,
+            todo: payload.task,
+            completed: false
+        };
 
-        res.status(201).json({
-            success: true,
-            message: 'Tugas berhasil ditambahkan!',
-            data: createdTodo
-        });
-    } catch (error) {
-        console.error('Error createTodo:', error);
-        res.status(500).json({ success: false, message: 'Gagal menambahkan tugas.' });
+        sendSuccess(res, 'Tugas berhasil ditambahkan!', data, 201);
+    } catch {
+        sendError(res, 'Gagal menambahkan tugas.', 500);
     }
 };
 
-// 4. Update Todo (Toggle Completed / Edit Task)
 export const updateTodo = async (req: Request, res: Response): Promise<void> => {
-    const userId = res.locals.userId;
-    const id = parseInt(req.params.id as string, 10);
-    const { is_completed, task } = req.body;
-
-    if (isNaN(id)) {
-        res.status(400).json({ success: false, message: 'ID tugas tidak valid.' });
-        return;
-    }
+    const { id } = req.params;
+    const payload: UpdateTodoRequest = req.body;
+    const userId = req.user.id;
 
     try {
-        const todo: any = await TodoModel.getById(id);
-        if (!todo) {
-            res.status(404).json({ success: false, message: 'Tugas tidak ditemukan!' });
+        const affectedRows = await TodoModel.update(
+            Number(id),
+            payload.task,
+            payload.is_completed,
+            userId
+        );
+
+        if (affectedRows === 0) {
+            sendError(res, 'Tugas tidak ditemukan!', 404);
             return;
         }
 
-        // Cek izin update
-        if (todo.project_id) {
-            const isMember = await ProjectModel.isMember(todo.project_id, userId);
-            if (!isMember) {
-                res.status(403).json({ success: false, message: 'Akses ditolak.' });
-                return;
-            }
-        } else if (todo.user_id !== userId) {
-            res.status(403).json({ success: false, message: 'Akses ditolak.' });
-            return;
-        }
-
-        await TodoModel.update(id, is_completed, task);
-        const updated = await TodoModel.getById(id);
-        res.status(200).json({ success: true, message: 'Tugas berhasil diperbarui!', data: updated });
-    } catch (error) {
-        console.error('Error updateTodo:', error);
-        res.status(500).json({ success: false, message: 'Gagal memperbarui tugas.' });
+        sendSuccess(res, 'Tugas berhasil diperbarui!');
+    } catch {
+        sendError(res, 'Gagal memperbarui tugas.', 500);
     }
 };
 
-// 5. Hapus Todo Berdasarkan ID
 export const deleteTodo = async (req: Request, res: Response): Promise<void> => {
-    const userId = res.locals.userId;
-    const id = parseInt(req.params.id as string, 10);
-
-    if (isNaN(id)) {
-        res.status(400).json({ success: false, message: 'ID tugas tidak valid.' });
-        return;
-    }
+    const { id } = req.params;
+    const userId = req.user.id;
 
     try {
-        const todo: any = await TodoModel.getById(id);
-        if (!todo) {
-            res.status(404).json({ success: false, message: 'Tugas tidak ditemukan!' });
+        const affectedRows = await TodoModel.delete(Number(id), userId);
+
+        if (affectedRows === 0) {
+            sendError(res, 'Tugas tidak ditemukan!', 404);
             return;
         }
 
-        // Cek izin hapus: di project bisa dihapus oleh pembuat tugas atau pembuat project
-        if (todo.project_id) {
-            const project = await ProjectModel.getById(todo.project_id);
-            const isCreator = todo.user_id === userId || (project && project.created_by === userId);
-            if (!isCreator) {
-                res.status(403).json({ success: false, message: 'Hanya pembuat tugas atau pemilik project yang dapat menghapus tugas ini.' });
-                return;
-            }
-        } else if (todo.user_id !== userId) {
-            res.status(403).json({ success: false, message: 'Akses ditolak.' });
-            return;
-        }
-
-        await TodoModel.delete(id);
-        res.status(200).json({ success: true, message: 'Tugas berhasil dihapus!' });
-    } catch (error) {
-        console.error('Error deleteTodo:', error);
-        res.status(500).json({ success: false, message: 'Gagal menghapus tugas.' });
+        sendSuccess(res, 'Tugas berhasil dihapus!');
+    } catch {
+        sendError(res, 'Gagal menghapus tugas.', 500);
     }
 };

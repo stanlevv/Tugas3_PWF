@@ -10,6 +10,15 @@ export const UserModel = {
         return rows[0];
     },
 
+    // Alias untuk mencari berdasarkan username
+    findByUsername: async (username: string) => {
+        const [rows]: any = await pool.query(
+            'SELECT id, username, email, password FROM users WHERE username = ? LIMIT 1',
+            [username]
+        );
+        return rows[0];
+    },
+
     // 2. Simpan user baru ke database (untuk Register)
     create: async (username: string, email: string, hashedPassword: string) => {
         const [result]: any = await pool.query(
@@ -37,4 +46,3 @@ export const UserModel = {
         return result.affectedRows > 0;
     }
 };
-
