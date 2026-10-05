@@ -1,54 +1,73 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://dummyjson.com';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export class ApiError extends Error {
     status: number;
     statusText: string;
+    data?: any;
 
-    constructor(message: string, status: number, statusText: string) {
+    constructor(message: string, status: number, statusText: string, data?: any) {
         super(message);
         this.name = 'ApiError';
         this.status = status;
         this.statusText = statusText;
+        this.data = data;
     }
 }
 
-export async function apiClient<T>(
+export interface ApiResponse<T = any> {
+    success: boolean;
+    message?: string;
+    data?: T;
+    meta?: {
+        page?: number;
+        perPage?: number;
+        total?: number;
+        totalPages?: number;
+        [key: string]: any;
+    };
+}
+
+export async function apiClient<T = any>(
     endpoint: string,
     options: RequestInit = {}
 ): Promise<T> {
-    const url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+    const cleanBase = API_BASE_URL.replace(/\/+$/, '');
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const url = `${cleanBase}${cleanEndpoint}`;
 
-    const defaultHeaders: HeadersInit = {
+    const headers: Record<string, string> = {
         'Content-Type': 'application/json',
+        ...(options.headers as Record<string, string>),
     };
+
+    if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('token');
+        if (token && !headers['Authorization']) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+    }
 
     try {
         const response = await fetch(url, {
             signal: options.signal || AbortSignal.timeout(8000),
             ...options,
-            headers: {
-                ...defaultHeaders,
-                ...options.headers,
-            },
-            next: { revalidate: 60 },
+            headers,
         });
 
+        const json = await response.json().catch(() => null);
+
         if (!response.ok) {
-            throw new ApiError(
-                `HTTP Error: Gagal memuat data dari ${endpoint} (${response.status} ${response.statusText})`,
-                response.status,
-                response.statusText
-            );
+            const errorMsg = json?.message || `HTTP Error ${response.status}: ${response.statusText}`;
+            throw new ApiError(errorMsg, response.status, response.statusText, json);
         }
 
-        const data: T = await response.json();
-        return data;
+        return json as T;
     } catch (error) {
         if (error instanceof ApiError) {
             throw error;
         }
         throw new Error(
-            `Network Error: Tidak dapat terhubung ke server API (${(error as Error).message})`
+            `Network Error: Tidak dapat terhubung ke server backend (${(error as Error).message})`
         );
     }
 }

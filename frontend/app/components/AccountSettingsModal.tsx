@@ -69,7 +69,7 @@ export default function AccountSettingsModal({
     try {
       const res = await authApi.changePassword({ oldPassword, newPassword });
       if (res.success) {
-        onToast('success', 'Password berhasil diubah!');
+        onToast('success', 'Password diubah.');
         setOldPassword('');
         setNewPassword('');
         setConfirmPassword('');
@@ -103,14 +103,12 @@ export default function AccountSettingsModal({
             className="relative w-full max-w-lg bg-white/95 backdrop-blur-xl rounded-3xl border border-zinc-200/90 shadow-2xl p-6 sm:p-7 z-10 space-y-5"
           >
             {/* Header Modal */}
-            <div className="flex items-start justify-between border-b border-zinc-100 pb-3.5">
-              <div>
-                <span className="text-[10px] font-bold tracking-wider text-blue-600 uppercase block mb-0.5">
-                  Pengaturan Akun
-                </span>
+            <div className="flex items-center justify-between border-b border-zinc-100 pb-3.5">
+              <div className="flex-1">
                 <h2 className="text-lg sm:text-xl font-bold text-zinc-950 tracking-tight">
-                  Akun & Keamanan
+                  Pengaturan Akun
                 </h2>
+                <p className="text-xs text-zinc-500 mt-0.5">Profil dan keamanan</p>
               </div>
 
               <button
@@ -132,7 +130,7 @@ export default function AccountSettingsModal({
                 onClick={() => setActiveTab('profile')}
                 className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
                   activeTab === 'profile'
-                    ? 'bg-white text-zinc-900 shadow-2xs'
+                    ? 'bg-blue-600 text-white shadow-xs'
                     : 'text-zinc-500 hover:text-zinc-800'
                 }`}
               >
@@ -147,7 +145,7 @@ export default function AccountSettingsModal({
                 onClick={() => setActiveTab('security')}
                 className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
                   activeTab === 'security'
-                    ? 'bg-white text-zinc-900 shadow-2xs'
+                    ? 'bg-blue-600 text-white shadow-xs'
                     : 'text-zinc-500 hover:text-zinc-800'
                 }`}
               >
@@ -163,8 +161,8 @@ export default function AccountSettingsModal({
               {/* TAB 1: PROFIL */}
               {activeTab === 'profile' && (
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3.5 p-3.5 bg-zinc-50/80 rounded-2xl border border-zinc-200/80">
-                    <div className="w-12 h-12 rounded-2xl bg-zinc-950 text-white flex items-center justify-center font-bold text-lg shadow-xs">
+                  <div className="flex items-center gap-3.5 p-3.5 bg-blue-50/60 rounded-2xl border border-blue-100/80">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-xs">
                       {user?.username?.charAt(0).toUpperCase() || 'U'}
                     </div>
                     <div>
@@ -299,8 +297,7 @@ export default function AccountSettingsModal({
             </div>
 
             {/* Footer Action: Logout */}
-            <div className="border-t border-zinc-100 pt-3.5 flex items-center justify-between">
-              <span className="text-xs text-zinc-400">Keluar dari sesi saat ini?</span>
+            <div className="border-t border-zinc-100 pt-3.5 flex items-center justify-center">
               <motion.button
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}

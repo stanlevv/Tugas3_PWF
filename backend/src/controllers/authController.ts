@@ -25,10 +25,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 export const login = async (req: Request, res: Response): Promise<void> => {
     const payload: LoginRequest = req.body;
     try {
-        const user = await UserModel.findByUsername(payload.username);
+        const user = await UserModel.findByUsernameOrEmail(payload.username);
 
         if (!user || !(await bcrypt.compare(payload.password, user.password))) {
-            sendError(res, 'Username atau password salah!', 401);
+            sendError(res, 'Username/Email atau password salah!', 401);
             return;
         }
 
@@ -44,7 +44,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             { expiresIn: '24h' }
         );
 
-        sendSuccess(res, 'Login berhasil!', { token });
+        sendSuccess(res, 'Login berhasil!', { token, user: tokenPayload });
     } catch {
         sendError(res, 'Error server.', 500);
     }

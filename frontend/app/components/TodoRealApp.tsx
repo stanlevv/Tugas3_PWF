@@ -73,7 +73,7 @@ export default function TodoRealApp() {
       <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
         <div className="text-center space-y-3">
           <div className="w-7 h-7 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-xs text-zinc-400 font-medium">Memeriksa sesi otentikasi...</p>
+          <p className="text-xs text-zinc-400 font-medium">Memuat...</p>
         </div>
       </div>
     );
@@ -146,7 +146,7 @@ export default function TodoRealApp() {
               <p className="text-xs text-zinc-500 mt-0.5">
                 {activeProject
                   ? `Ruang kolaborasi tim "${activeProject.name}" • Kode: ${activeProject.code}`
-                  : 'Kelola catatan dan tugas harian Anda (Terhubung ke MySQL Laragon)'}
+                  : 'Tugas pribadi Anda'}
               </p>
             </div>
 
@@ -188,7 +188,7 @@ export default function TodoRealApp() {
             <TodoForm
               onAddTodo={async (task) => {
                 await addTodo(task);
-                showToast('success', 'Tugas baru berhasil ditambahkan!');
+                showToast('success', 'Tugas ditambahkan.');
               }}
             />
           </div>
@@ -214,7 +214,7 @@ export default function TodoRealApp() {
               }}
               onEditTodo={async (id, newText) => {
                 await updateTodoText(id, newText);
-                showToast('success', 'Teks tugas berhasil diperbarui!');
+                showToast('success', 'Tugas diperbarui.');
               }}
               onRefresh={() => {
                 refresh();
@@ -231,12 +231,12 @@ export default function TodoRealApp() {
         onClose={() => setIsProjectModalOpen(false)}
         onCreate={async (name) => {
           const res = await createProject(name);
-          showToast('success', `Ruang "${name}" berhasil dibuat!`);
+          showToast('success', `Ruang "${name}" dibuat.`);
           return res;
         }}
         onJoin={async (code) => {
           const res = await joinProject(code);
-          showToast('success', `Berhasil bergabung ke ruang project!`);
+          showToast('success', 'Bergabung ke ruang project.');
           return res;
         }}
       />

@@ -65,15 +65,28 @@ export const authApi = {
   },
 
   login: async (payload: { username?: string; email?: string; password: string }) => {
-    return request<{
+    const res = await request<{
       success: boolean;
       message: string;
-      token: string;
-      data?: { id: number; username: string; email: string };
+      data?: {
+        token: string;
+        user?: { id: number; username: string; email: string };
+      };
+      token?: string;
     }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
+
+    const token = res.data?.token || res.token || '';
+    const user = res.data?.user || { id: 0, username: payload.username || '', email: payload.username || '' };
+
+    return {
+      success: res.success,
+      message: res.message,
+      token,
+      data: user,
+    };
   },
 
   changePassword: async (payload: { oldPassword: string; newPassword: string }) => {

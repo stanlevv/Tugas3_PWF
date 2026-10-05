@@ -64,11 +64,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const newTodo = await todoService.createTodo({
-            todo: body.todo,
-            completed: Boolean(body.completed),
-            userId: Number(body.userId) || 1,
-        });
+        const newTodo = await todoService.createTodo(body.todo);
 
         return NextResponse.json(
             {

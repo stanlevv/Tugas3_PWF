@@ -4,7 +4,7 @@ export const TodoModel = {
     // 1. Ambil data tugas dengan pagination
     getByUserId: async (userId: number, limit: number, offset: number) => {
         const [rows] = await pool.query(
-            'SELECT * FROM todos WHERE user_id = ? ORDER BY id DESC LIMIT ? OFFSET ?',
+            'SELECT id, user_id, project_id, task, is_completed FROM todos WHERE user_id = ? ORDER BY id DESC LIMIT ? OFFSET ?',
             [userId, limit, offset]
         );
         return rows;
@@ -35,8 +35,8 @@ export const TodoModel = {
     // 4. Ambil satu tugas berdasarkan ID
     getById: async (id: number, userId?: number) => {
         const query = userId
-            ? 'SELECT * FROM todos WHERE id = ? AND user_id = ? LIMIT 1'
-            : 'SELECT * FROM todos WHERE id = ? LIMIT 1';
+            ? 'SELECT id, user_id, project_id, task, is_completed FROM todos WHERE id = ? AND user_id = ? LIMIT 1'
+            : 'SELECT id, user_id, project_id, task, is_completed FROM todos WHERE id = ? LIMIT 1';
         const params = userId ? [id, userId] : [id];
 
         const [rows]: any = await pool.query(query, params);

@@ -38,12 +38,12 @@ export default function HomePage() {
         {/* Left Column: Hero Text & Dynamic Actions */}
         <div className="lg:col-span-7 space-y-6">
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-gray-950 leading-[1.1]">
-            Welcome to<br />
-            My <span className="text-[#0070f3]">Project</span>
+            Todo<br />
+            <span className="text-[#0070f3]">Workspace</span>
           </h1>
 
           <p className="text-gray-500 text-sm sm:text-base md:text-lg leading-relaxed max-w-xl font-normal">
-            Aplikasi pencatatan tugas modern yang cepat, terstruktur, dan terintegrasi langsung dengan Express.js dan database MySQL. Seluruh fitur dapat digunakan secara gratis tanpa batasan.
+            Catat tugas pribadi atau kelompok, simpan ke MySQL, dan pantau progres dari satu tempat. Backend Express.js, frontend Next.js.
           </p>
 
           {/* Dynamic Auth State Controls */}
@@ -100,7 +100,7 @@ export default function HomePage() {
         <div className="lg:col-span-5 flex justify-center lg:justify-end">
           <div className="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl border border-gray-200/80 p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <span className="text-[11px] font-semibold tracking-wider text-gray-400 uppercase block mb-5">
-              PREVIEW APLIKASI
+              FITUR
             </span>
 
             {/* Inner Clean Preview Card */}
@@ -108,29 +108,29 @@ export default function HomePage() {
               <div>
                 <div className="flex items-center justify-between">
                   <h2 className="text-base font-semibold text-gray-900 leading-snug">
-                    Workspace Terpadu
+                    Tugas & Kolaborasi
                   </h2>
                   <span className="text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-md">
-                    100% Gratis
+                    Open
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  Kelola tugas harian individu maupun kolaborasi kelompok.
+                  Tugas pribadi dan ruang kelompok dalam satu dashboard.
                 </p>
               </div>
 
               <div className="space-y-2 pt-1">
                 <div className="flex items-center gap-2 text-xs text-gray-700">
                   <span className="text-emerald-600 font-bold">✓</span>
-                  <span>Tugas Pribadi & Ruang Kolaborasi Tim</span>
+                  <span>Tugas pribadi dan ruang kelompok</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-700">
                   <span className="text-emerald-600 font-bold">✓</span>
-                  <span>Integrasi Penuh Basis Data MySQL</span>
+                  <span>Tersimpan di MySQL, bukan localStorage</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-700">
                   <span className="text-emerald-600 font-bold">✓</span>
-                  <span>Pencarian Cepat & Filter Real-time</span>
+                  <span>Cari dan filter tugas langsung</span>
                 </div>
               </div>
 
@@ -139,7 +139,7 @@ export default function HomePage() {
                   href="/todos"
                   className="w-full inline-flex items-center justify-center py-2.5 bg-[#0070f3] hover:bg-[#0060df] text-white text-xs font-semibold rounded-xl shadow-xs transition-colors"
                 >
-                  Buka Aplikasi Sekarang →
+                  Buka →
                 </Link>
               </div>
             </div>

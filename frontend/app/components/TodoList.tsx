@@ -162,7 +162,7 @@ export default function TodoList({
       {loading && todos.length === 0 && (
         <div className="py-12 text-center space-y-2">
           <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-xs text-zinc-400 font-medium">Sinkronisasi data MySQL...</p>
+          <p className="text-xs text-zinc-400 font-medium">Memuat data...</p>
         </div>
       )}
 
@@ -180,7 +180,7 @@ export default function TodoList({
           <p className="text-xs text-zinc-500 max-w-sm mx-auto">
             {searchQuery
               ? `Hasil pencarian untuk "${searchQuery}" tidak ditemukan.`
-              : 'Tulis tugas baru Anda pada formulir di atas untuk mulai mencatat produktivitas!'}
+              : 'Tambahkan tugas pertama lewat formulir di atas.'}
           </p>
         </div>
       )}

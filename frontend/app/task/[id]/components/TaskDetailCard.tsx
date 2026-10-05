@@ -95,17 +95,6 @@ export default function TaskDetailCard({ todo }: TaskDetailCardProps) {
             <h2 className="text-lg font-bold text-zinc-950 mt-0.5">{todo.title || todo.task}</h2>
           </div>
 
-          {todo.description && (
-            <div>
-              <label className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider block">
-                Deskripsi
-              </label>
-              <p className="text-zinc-700 bg-zinc-50/80 p-3.5 rounded-2xl border border-zinc-200/70 mt-1 text-xs sm:text-sm leading-relaxed">
-                {todo.description}
-              </p>
-            </div>
-          )}
-
           <div>
             <label className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider block">
               Tanggal Dibuat

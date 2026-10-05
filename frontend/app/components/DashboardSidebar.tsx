@@ -48,11 +48,9 @@ export default function DashboardSidebar({
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-40 bg-white/85 backdrop-blur-xl border-r border-zinc-200/80 flex flex-col justify-between transition-all duration-300 ${
-          isCollapsed ? 'w-20' : 'w-64 sm:w-72'
-        } ${
-          mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
+        className={`fixed top-0 bottom-0 left-0 z-40 bg-white/85 backdrop-blur-xl border-r border-zinc-200/80 flex flex-col justify-between transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64 sm:w-72'
+          } ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          }`}
       >
         {/* TOP SECTION: Header & Navigation */}
         <div className="p-4 space-y-6 overflow-y-auto">
@@ -115,18 +113,15 @@ export default function DashboardSidebar({
                 onMobileClose();
               }}
               title="Tugas Pribadi"
-              className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium rounded-xl transition-all cursor-pointer ${
-                isCollapsed ? 'justify-center' : ''
-              } ${
-                activeProject === null
+              className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium rounded-xl transition-all cursor-pointer ${isCollapsed ? 'justify-center' : ''
+                } ${activeProject === null
                   ? 'bg-blue-50/80 text-blue-600 border border-blue-200/70 font-semibold shadow-xs'
                   : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/80'
-              }`}
+                }`}
             >
               <svg
-                className={`w-4 h-4 flex-shrink-0 ${
-                  activeProject === null ? 'text-blue-600' : 'text-zinc-500'
-                }`}
+                className={`w-4 h-4 flex-shrink-0 ${activeProject === null ? 'text-blue-600' : 'text-zinc-500'
+                  }`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -147,9 +142,8 @@ export default function DashboardSidebar({
                 onMobileClose();
               }}
               title="Buat atau Gabung Ruang Kelompok"
-              className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium rounded-xl transition-all cursor-pointer text-zinc-600 hover:text-blue-600 hover:bg-blue-50/60 ${
-                isCollapsed ? 'justify-center' : ''
-              }`}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium rounded-xl transition-all cursor-pointer text-zinc-600 hover:text-blue-600 hover:bg-blue-50/60 ${isCollapsed ? 'justify-center' : ''
+                }`}
             >
               <svg className="w-4 h-4 text-zinc-500 hover:text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -187,20 +181,17 @@ export default function DashboardSidebar({
                       onMobileClose();
                     }}
                     title={p.name}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium rounded-xl transition-all cursor-pointer ${
-                      isCollapsed ? 'justify-center' : ''
-                    } ${
-                      isActive
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium rounded-xl transition-all cursor-pointer ${isCollapsed ? 'justify-center' : ''
+                      } ${isActive
                         ? 'bg-blue-600 text-white shadow-xs font-semibold'
                         : 'text-zinc-700 hover:bg-zinc-100/80 hover:text-zinc-900'
-                    }`}
+                      }`}
                   >
                     <div
-                      className={`w-5 h-5 rounded-md flex items-center justify-center font-bold text-[10px] flex-shrink-0 ${
-                        isActive
+                      className={`w-5 h-5 rounded-md flex items-center justify-center font-bold text-[10px] flex-shrink-0 ${isActive
                           ? 'bg-white/20 text-white'
                           : 'bg-zinc-100 text-zinc-700 border border-zinc-200/80'
-                      }`}
+                        }`}
                     >
                       {p.name.charAt(0).toUpperCase()}
                     </div>
@@ -219,9 +210,8 @@ export default function DashboardSidebar({
                 type="button"
                 onClick={onOpenProjectModal}
                 title="Buat atau Gabung Ruang Kelompok"
-                className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-xl border border-dashed border-zinc-300 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/40 text-zinc-500 transition-all cursor-pointer ${
-                  isCollapsed ? 'justify-center' : ''
-                }`}
+                className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-xl border border-dashed border-zinc-300 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/40 text-zinc-500 transition-all cursor-pointer ${isCollapsed ? 'justify-center' : ''
+                  }`}
               >
                 <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -240,9 +230,8 @@ export default function DashboardSidebar({
             transition={SPRING_TRANSITION}
             onClick={onOpenAccountModal}
             title="Klik untuk Pengaturan Akun"
-            className={`flex items-center gap-2.5 p-2 rounded-2xl bg-white/70 hover:bg-white border border-zinc-200/60 hover:border-zinc-300 shadow-2xs hover:shadow-xs transition-all cursor-pointer group ${
-              isCollapsed ? 'justify-center' : ''
-            }`}
+            className={`flex items-center gap-2.5 p-2 rounded-2xl bg-white/70 hover:bg-white border border-zinc-200/60 hover:border-zinc-300 shadow-2xs hover:shadow-xs transition-all cursor-pointer group ${isCollapsed ? 'justify-center' : ''
+              }`}
           >
             {/* User Avatar in Blue */}
             <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-xs flex-shrink-0 group-hover:bg-blue-700 transition-colors">

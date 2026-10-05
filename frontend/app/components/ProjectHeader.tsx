@@ -31,7 +31,7 @@ export default function ProjectHeader({
     try {
       await navigator.clipboard.writeText(project.code);
       setCopied(true);
-      if (onToast) onToast('success', `Kode "${project.code}" berhasil disalin!`);
+      if (onToast) onToast('success', `Kode "${project.code}" disalin.`);
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // Fallback
@@ -44,7 +44,7 @@ export default function ProjectHeader({
       setLoading(true);
       try {
         await onDelete(project.id);
-        if (onToast) onToast('info', 'Ruang project berhasil dihapus.');
+        if (onToast) onToast('info', 'Ruang dihapus.');
       } catch (err: any) {
         if (onToast) onToast('error', err.message || 'Gagal menghapus ruang project.');
       } finally {
@@ -55,7 +55,7 @@ export default function ProjectHeader({
       setLoading(true);
       try {
         await onLeave(project.id);
-        if (onToast) onToast('info', 'Anda telah keluar dari ruang kelompok.');
+        if (onToast) onToast('info', 'Keluar dari ruang kelompok.');
       } catch (err: any) {
         if (onToast) onToast('error', err.message || 'Gagal keluar dari ruang project.');
       } finally {
@@ -130,7 +130,7 @@ export default function ProjectHeader({
             <div
               key={m.id}
               title={`${m.username} (${m.email})`}
-              className="w-6 h-6 rounded-full bg-zinc-900 text-white flex items-center justify-center font-bold text-[9px] ring-2 ring-white shadow-2xs"
+              className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-[9px] ring-2 ring-white shadow-2xs"
             >
               {m.username.charAt(0).toUpperCase()}
             </div>
